@@ -1,13 +1,13 @@
 <template>
 <div class="tile is-parent is-vertical">
     <div class="tile">
-        <div class="tile is-parent notification has-background-grey-darker">
+        <div class="tile is-parent notification" :class="statusClass">
             <article class="tile is-child">
                 <nav class="level is-mobile">
                     <div class="level-item has-text-centered">
                         <div>
                             <p class="subtitle is-6 is-spaced">Status</p>
-                            <p class="title is-6">Offline</p>
+                            <p class="title is-6">{{node.status}}</p>
                         </div>
                     </div>
                     <div class="level-item has-text-centered">
@@ -79,11 +79,9 @@
                     <div class="level-right">
                         <div class="level-item">
                             <div class="field is-grouped is-grouped-multiline">
-                                <!--
-                                <div class="control" v-for="(p, index) in serverParams" :key="index">
-                                    <tag :param="p"></tag>
-                                </div>
-                                -->
+                                <div class="control" v-for="(p, index) in node.params" :key="index">
+                                    <tag :label="p.label" :id="node.id"></tag>
+                                </div>                                
                             </div>
                         </div>
                     </div>
@@ -95,7 +93,6 @@
 </template>
 
 <script>
-import moment from 'moment'
 import Tag from './NodeParamTag'
 export default {
   name: 'node',
@@ -104,22 +101,42 @@ export default {
     Tag
   },
   computed: {
-      node() {
+    node() {
         return this.$store.getters.getNodeById(this.id)
-      },
-      ip() {
+    },
+    statusClass() {
+        return this.node.status == "Offline" ? "has-background-danger" : "has-background-grey-darker"
+    },
+    ip() {
         const n = this.node
         var ips = n.ip
         n.network_interfaces.forEach(network => {
             if (network.ip != n.ip) {
                 ips += "<br>" + network.ip
             }
-        });
+        })
         return ips
-      },
-      uptime() {
-          return moment(this.node.last_connection_at).fromNow()
+    },
+    uptime() {
+        return this.node.status == "Online" ? this.$moment(this.node.last_connection_at).fromNow() : "N/D"
+    }
+  },
+  created: function() {
+      this.timer = setInterval(this.verifyStatus, 5000)
+  },
+  methods: {
+      verifyStatus: function() {
+          const node = this.$store.getters.getNodeById(this.id)
+          const diff = this.$moment().diff(this.$moment(node.last_updated_at), 'seconds')
+          console.log(diff + " - " + node.status)
+          if (diff > 10 && node.status == "Online") {
+              node.status = "Offline"
+              this.$store.commit('updateNode', node)
+          }
       }
+  },
+  beforeDestroy() {
+      clearInterval(this.timer)
   }
 }
 </script>
