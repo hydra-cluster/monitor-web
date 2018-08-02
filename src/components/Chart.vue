@@ -9,7 +9,15 @@ import Chart from 'chart.js'
 export default {
     data: function () {
         return {
-            tag: "CPU Load"
+            tag: "CPU Load",
+            chartColors: [
+                'rgb(54, 162, 235)',    //blue
+                'rgb(255, 159, 64)',    //orange
+                'rgb(75, 192, 192)',    //green
+                'rgb(255, 205, 86)',    //yellow
+                'rgb(153, 102, 255)',   //purple
+                'rgb(255, 99, 132)'     //red
+            ]
         }
     },
     computed: {
@@ -19,14 +27,14 @@ export default {
     },
     watch: { 
         nodes: function (updatedNodes) {
-            updatedNodes.forEach(node => {
+            updatedNodes.forEach((node, key) => {
               var dataset = this.chart.data.datasets.find(ds => ds.label == node.hostname)  
               if (this.$lodash.isEmpty(dataset)) {
                 var newDataset = {
                     label: node.hostname,
                     borderWidth: 1,
-                    borderColor: 'rgb(255, 99, 132)',
-                    backgroundColor: 'rgb(255, 99, 132)',
+                    borderColor: this.chartColors[key],
+                    backgroundColor: this.chartColors[key],
                     fill: false,
                     minSize: 0,
                     data: [],
