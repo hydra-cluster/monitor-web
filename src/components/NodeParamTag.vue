@@ -17,9 +17,9 @@ export default {
             const node = this.$store.getters.getNodeById(this.id)
             if (node.status == "Offline") {
                 return "has-background-grey-dark has-text-white"
-            } else if (this.param.value > this.param.danger_target) {
+            } else if (parseInt(this.param.value) > parseInt(this.param.danger_target)) {
                 return "is-danger"
-            } else if (this.param.value > this.param.warning_target) {
+            } else if (parseInt(this.param.value) > parseInt(this.param.warning_target)) {
                 return "is-warning" 
             }
             return "is-primary"

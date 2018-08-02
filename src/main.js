@@ -29,7 +29,7 @@ const store = new Vuex.Store({
       const n = state.nodes.find(node => {
         return node.id == newNode.id
       })
-      if (n !== null && n !== undefined) {
+      if (!lodash.isEmpty(n)) {
         state.nodes.splice(state.nodes.indexOf(n), 1)
       }
       state.nodes.push(newNode)
@@ -45,8 +45,17 @@ socket.onopen = function () {
 
 socket.onmessage = function (msg) {
   const node = JSON.parse(msg.data)
-  node.new_val.status = "Online"
-  store.commit('updateNode', node.new_val)
+
+  if (lodash.isEmpty(node.new_val)) {
+    lodash.forEach(node, function(value) {
+      value.status = "Offline"
+      store.commit('updateNode', value)
+    })
+    store.state.nodes = node
+  } else {
+    node.new_val.status = "Online"
+    store.commit('updateNode', node.new_val)
+  }
 }
 
 new Vue({

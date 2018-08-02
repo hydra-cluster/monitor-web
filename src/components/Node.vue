@@ -128,8 +128,8 @@ export default {
       verifyStatus: function() {
           const node = this.$store.getters.getNodeById(this.id)
           const diff = this.$moment().diff(this.$moment(node.last_updated_at), 'seconds')
-          console.log(diff + " - " + node.status)
-          if (diff > 10 && node.status == "Online") {
+
+          if (diff > 20 && node.status == "Online") {
               node.status = "Offline"
               this.$store.commit('updateNode', node)
           }

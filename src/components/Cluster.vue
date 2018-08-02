@@ -2,19 +2,9 @@
 <div class="tile is-ancestor is-vertical">
   <div class="tile">
     <div class="tile">
-      <div class="tile is-parent">
-        <article class="tile is-child notification has-background-grey-light">
-          <p class="title">One</p>
-        </article>
-      </div>
-      <div class="tile is-parent">
-        <article class="tile is-child notification has-background-grey-light">
-          <p class="title">Two</p>
-        </article>
-      </div>
-      <div class="tile is-parent">
-        <article class="tile is-child notification has-background-grey-light">
-          <p class="title">Three</p>
+      <div class="tile is-parent chart-tile">
+        <article class="tile is-child">
+          <chart></chart>
         </article>
       </div>
     </div>
@@ -28,19 +18,24 @@
 </template>
 
 <script>
-import Node from "./Node"
+import Node from './Node'
+import Chart from './Chart'
 export default {
   name: 'cluster',
   components: {
-    Node
+    Node,
+    Chart
   },
   computed: {
     nodes() {
-      return this.$store.getters.getNodes;
+      return this.$store.getters.getNodes
     }
   }
 }
 </script>
 
-<style>
+<style scoped>
+  .chart-tile {
+    min-width: 0;
+  }
 </style>
