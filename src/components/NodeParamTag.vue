@@ -15,7 +15,7 @@ export default {
         },
         status() {
             const node = this.$store.getters.getNodeById(this.id)
-            if (node.status == "Offline") {
+            if (node.status != "Online") {
                 return "has-background-grey-dark has-text-white"
             } else if (parseInt(this.param.value) > parseInt(this.param.danger_target)) {
                 return "is-danger"
@@ -25,7 +25,7 @@ export default {
             return "is-primary"
         },
         value() {
-            return this.$store.getters.getNodeById(this.id).status == "Offline" ? "N/D" : this.param.value + this.param.unit
+            return this.$store.getters.getNodeById(this.id).status != "Online" ? "N/D" : this.param.value + this.param.unit
         }
     }
 }

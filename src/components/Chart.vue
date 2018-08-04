@@ -41,14 +41,17 @@ export default {
                 }
                 this.chart.data.datasets.push(newDataset)
               } else {
-                if (node.status == "Offline") {
+                if (node.status != "Online") {
                     const index = this.chart.data.datasets.indexOf(dataset)
                     this.chart.data.datasets.splice(index, 1)
-                    console.log("Offline: index = "+ index)
                 } else {
+                    const param = node.params.find(p => p.label == this.tag)
+                    if (this.$lodash.isEmpty(param)) {
+                        return
+                    }
                     var data = {
                         x: this.$moment(node.last_updated_at),
-                        y: node.params.find(p => p.label == this.tag).value
+                        y: param.value
                     }
                     if (dataset.data.length > 15) {
                         dataset.data.shift()

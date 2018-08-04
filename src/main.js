@@ -27,7 +27,7 @@ const store = new Vuex.Store({
   mutations: {
     updateNode(state, newNode) {
       const n = state.nodes.find(node => {
-        return node.id == newNode.id
+        return node.hostname == newNode.hostname
       })
       if (!lodash.isEmpty(n)) {
         state.nodes.splice(state.nodes.indexOf(n), 1)
@@ -37,24 +37,27 @@ const store = new Vuex.Store({
   }
 })
 
-const socket = new WebSocket("ws://head01.hydra:5000/ws")
+var uuid = "web" + Math.floor(new Date().valueOf() * Math.random()) + ".hydra"
+const socket = new WebSocket("ws://localhost:5000/ws?id=" + uuid + "&mode=web")
 
 socket.onopen = function () {
   console.log("Connected to server")
 }
 
 socket.onmessage = function (msg) {
-  const node = JSON.parse(msg.data)
-
-  if (lodash.isEmpty(node.new_val)) {
-    lodash.forEach(node, function(value) {
-      value.status = "Offline"
-      store.commit('updateNode', value)
-    })
-    store.state.nodes = node
-  } else {
-    node.new_val.status = "Online"
-    store.commit('updateNode', node.new_val)
+  const message = JSON.parse(msg.data)
+  console.log(message)
+  switch(message.Action) {
+    case "registered-agents":
+      lodash.forEach(message.Content.registered, function(node) {
+        node.status = "Offline"
+        store.commit('updateNode', node)
+      })
+      break
+    case "updated-agent":
+      message.Content.status = "Online"
+      store.commit('updateNode', message.Content)
+      break
   }
 }
 
